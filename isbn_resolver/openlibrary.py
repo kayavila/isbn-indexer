@@ -17,8 +17,9 @@ class OpenLibraryResolver(ISBNResolver):
 
         return results
 
-    def _get_query_request(self, isbn: str):
-        return 'https://openlibrary.org/api/books?bibkeys=ISBN:{}&jscmd=details&format=json'.format(isbn)
+    def _get_query_request(self, isbn: str) -> requests.Request:
+        u = 'https://openlibrary.org/api/books?bibkeys=ISBN:{}&jscmd=details&format=json'.format(isbn)
+        return requests.Request(url=u)
 
     def _parse_response(self, isbn: str, book_data_response: requests.Response) -> dict:
         book_json = book_data_response.json()

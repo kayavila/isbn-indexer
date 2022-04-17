@@ -64,12 +64,12 @@ class ISBNResolver:
         """
         pass
 
-    def _get_query_request(self, isbn) -> str:
+    def _get_query_request(self, isbn) -> requests.Request:
         """
         Generates the appropriate query for the backend service
 
-        :param isbn:
-        :return: A URL query string
+        :param isbn: A 10-digit or 13-digit ISBN
+        :return: The requests Request to be executed
         """
         pass
 
@@ -92,14 +92,14 @@ class ISBNResolver:
         :param verbose: Whether to print debugging information
         :return: Information about the book
         """
-        url = self._get_query_request(isbn)
+        req = self._get_query_request(isbn)
 
         # Only try three times before giving up
         attempts_left = 3
         response = None
         while attempts_left > 0 and response is None:
             try:
-                response = requests.get(url)
+                response = req.prepare()
             except (ConnectionError, ConnectTimeout):
                 if verbose:
                     stderr.write('Encountered error attempting to access {}.  Retrying in 5 seconds...\n'.format(url))
