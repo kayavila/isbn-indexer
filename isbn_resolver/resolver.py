@@ -15,6 +15,10 @@ class NoBookDataError(Exception):
     pass
 
 
+class MissingDataError(Exception):
+    pass
+
+
 class ISBNResolver:
     def __init__(self, data_file: str):
         self.data_file = Path(data_file)
@@ -55,7 +59,7 @@ class ISBNResolver:
         else:
             return None
 
-    def get_book_author(self, isbn) -> list:
+    def get_author(self, isbn) -> list:
         """
         Return a list of authors of a book
 
@@ -63,6 +67,14 @@ class ISBNResolver:
         :return: A list of authors, potentially empty
         """
         pass
+
+    def get_year(self, isbn) -> int:
+        """
+        Return the original publication year of a book
+
+        :param isbn: A 10-digit or 13-digit ISBN
+        :return: An integer value for year
+        """
 
     def _get_query_request(self, isbn) -> requests.Request:
         """
@@ -93,13 +105,16 @@ class ISBNResolver:
         :return: Information about the book
         """
         req = self._get_query_request(isbn)
+        url = req.url
+        prepped_req = req.prepare()
+        session = requests.Session()
 
         # Only try three times before giving up
         attempts_left = 3
         response = None
         while attempts_left > 0 and response is None:
             try:
-                response = req.prepare()
+                response = session.send(prepped_req)
             except (ConnectionError, ConnectTimeout):
                 if verbose:
                     stderr.write('Encountered error attempting to access {}.  Retrying in 5 seconds...\n'.format(url))
