@@ -15,7 +15,7 @@ class OpenLibraryResolver(ISBNResolver):
         results = []
 
         try:
-            authors = book_data[isbn]['details']['authors']
+            authors = book_data['details']['authors']
         except KeyError:
             raise MissingDataError('No author data for isbn {}'.format(isbn))
 
@@ -55,6 +55,33 @@ class OpenLibraryResolver(ISBNResolver):
 
         return int(num_pages)
 
+    def get_publisher(self, isbn) -> int:
+        book_data = self.get_book_data(isbn)
+
+        # Don't have it locally and couldn't successfully query
+        if not book_data:
+            raise NoBookDataError
+
+        try:
+            publishers = book_data['details']['publishers']
+        except KeyError:
+            raise MissingDataError('No publishers data for isbn {}'.format(isbn))
+
+        return publishers
+
+    def get_location(self, isbn) -> int:
+        book_data = self.get_book_data(isbn)
+
+        # Don't have it locally and couldn't successfully query
+        if not book_data:
+            raise NoBookDataError
+
+        try:
+            locations = book_data['details']['publish_places']
+        except KeyError:
+            raise MissingDataError('No publication location data for isbn {}'.format(isbn))
+
+        return locations
 
     def _get_query_request(self, isbn: str) -> requests.Request:
         u = 'https://openlibrary.org/api/books?bibkeys=ISBN:{}&jscmd=details&format=json'.format(isbn)

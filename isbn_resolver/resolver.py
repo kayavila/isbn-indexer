@@ -84,6 +84,22 @@ class ISBNResolver:
         :return: An integer value for number of pages
         """
 
+    def get_publisher(self, isbn) -> int:
+        """
+        Return the number of pages for a book
+
+        :param isbn: A 10-digit or 13-digit ISBN
+        :return: A list of publishers, potentially empty
+        """
+
+    def get_location(self, isbn) -> int:
+        """
+        Return the number of pages for a book
+
+        :param isbn: A 10-digit or 13-digit ISBN
+        :return: A list of locations published, potentially empty
+        """
+
     def _get_query_request(self, isbn) -> requests.Request:
         """
         Generates the appropriate query for the backend service
