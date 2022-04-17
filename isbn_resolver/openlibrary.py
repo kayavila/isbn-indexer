@@ -39,7 +39,22 @@ class OpenLibraryResolver(ISBNResolver):
         # Quick and dirty check to see if we're getting formats other than just year from OpenLibrary
         assert re.match('[1-9]([0-9]){3}', date)
 
-        return int(book_data['details']['publish_date'])
+        return int(date)
+
+    def get_page_count(self, isbn) -> int:
+        book_data = self.get_book_data(isbn)
+
+        # Don't have it locally and couldn't successfully query
+        if not book_data:
+            raise NoBookDataError
+
+        try:
+            num_pages = book_data['details']['number_of_pages']
+        except KeyError:
+            raise MissingDataError('No page count data for isbn {}'.format(isbn))
+
+        return int(num_pages)
+
 
     def _get_query_request(self, isbn: str) -> requests.Request:
         u = 'https://openlibrary.org/api/books?bibkeys=ISBN:{}&jscmd=details&format=json'.format(isbn)

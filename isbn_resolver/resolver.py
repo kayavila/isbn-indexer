@@ -76,6 +76,14 @@ class ISBNResolver:
         :return: An integer value for year
         """
 
+    def get_page_count(self, isbn) -> int:
+        """
+        Return the number of pages for a book
+
+        :param isbn: A 10-digit or 13-digit ISBN
+        :return: An integer value for number of pages
+        """
+
     def _get_query_request(self, isbn) -> requests.Request:
         """
         Generates the appropriate query for the backend service
