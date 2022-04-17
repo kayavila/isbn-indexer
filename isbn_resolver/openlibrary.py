@@ -1,8 +1,21 @@
 import requests
-from isbn_resolver.resolver import ISBNResolver
+from isbn_resolver.resolver import ISBNResolver, NoBookDataError
 
 
 class OpenLibraryResolver(ISBNResolver):
+
+    def get_book_author(self, isbn) -> list:
+        book_data = self.get_book_data(isbn)
+
+        # Don't have it locally and couldn't successfully query
+        if not book_data:
+            raise NoBookDataError
+
+        results = []
+        for a in book_data[isbn]['details']['authors']:
+            results.append(a['name'])
+
+        return results
 
     def _get_query_request(self, isbn: str):
         return 'https://openlibrary.org/api/books?bibkeys=ISBN:{}&jscmd=details&format=json'.format(isbn)
