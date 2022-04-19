@@ -22,7 +22,7 @@ class ISBNDBResolver(ISBNResolver):
         assert len(book_json) == 1
 
         book_data = book_json['book']
-        return {isbn: book_data}
+        return book_data
 
     def get_msrp(self, isbn) -> list:
         return self._get_data_or_error(isbn, ('msrp',), 'msrp')

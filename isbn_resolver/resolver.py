@@ -43,6 +43,9 @@ class ISBNResolver:
         :param verbose: Whether to print debugging information
         :return:
         """
+        # Ensure isbns are always strings
+        isbn = str(isbn)
+
         # Simply return if we have it already
         if isbn in self.data:
             return self.data[isbn]
@@ -50,14 +53,10 @@ class ISBNResolver:
         # Otherwise, query for it
         book_data = self._query_service(isbn, verbose)
         with open(self.data_file, 'a') as output_file:  # Save it to the disk for later
-            if book_data:
-                json.dump(book_data, output_file)
-            else:
-                json.dump({isbn: None}, output_file)
+            json.dump(book_data, output_file)
             output_file.write('\n')
         self.data[isbn] = book_data
 
-        # This may be None
         return book_data
 
     def get_author(self, isbn) -> list:
@@ -139,11 +138,10 @@ class ISBNResolver:
         :param error_msg_type: The type of data, to be included in any error messages
         :return: The data requested in the path
         """
-        book_data = self.get_book_data(isbn)
+        # Ensure isbns are always strings
+        isbn = str(isbn)
 
-        # Don't have it locally and couldn't successfully query
-        if not book_data:
-            raise NoBookDataError
+        book_data = self.get_book_data(isbn)
 
         # Keep trying to go down one level at a time
         selected_data = copy.deepcopy(book_data)
@@ -185,10 +183,17 @@ class ISBNResolver:
                 stderr.write('Unable to access {}.  Giving up after three attempts.'.format(url))
             raise QueryFailedError('Unable to access URL {}\n'.format(url))
 
-        elif response.status_code == 404 or not response.text:  # 404 error indicates that there's no data, stop trying
+        # 404 error indicates that there's no data, stop trying
+        elif response.status_code == 404 or not response.text:
             if verbose:
                 stderr.write('No data received for URL {}\n'.format(url))
-            return None
+            raise NoBookDataError
+
+        # Sometimes we get JSON, but it's empty
+        elif response.json() == {}:
+            if verbose:
+                stderr.write('Empty data received for URL {}\n'.format(url))
+            raise NoBookDataError
 
         elif response.status_code != 200:  # Otherwise, there's some sort of issue, and it should be retried later
             if verbose:

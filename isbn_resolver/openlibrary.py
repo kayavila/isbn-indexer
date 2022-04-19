@@ -16,7 +16,7 @@ class OpenLibraryResolver(ISBNResolver):
         assert len(book_json) == 1
 
         book_data = next(iter(book_json.items()))[1]
-        return {isbn: book_data}
+        return book_data
 
     def get_title(self, isbn):
         return self._get_data_or_error(isbn, ('details', 'title'), 'title')
