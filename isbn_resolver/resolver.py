@@ -120,6 +120,31 @@ class ISBNResolver:
         """
         pass
 
+    def _get_data_or_error(self, isbn: str, path: tuple, error_msg_type: str):
+        """
+        Used to either get book data or throw an error
+
+        :param isbn: A 10-digit or 13-digit isbn
+        :param path: The path inside the stored book data to traverse
+        :param error_msg_type: The type of data, to be included in any error messages
+        :return: The data requested in the path
+        """
+        book_data = self.get_book_data(isbn)
+
+        # Don't have it locally and couldn't successfully query
+        if not book_data:
+            raise NoBookDataError
+
+        # Keep trying to go down one level at a time
+        selected_data = book_data
+        try:
+            for p in path:
+                selected_data = book_data[p]
+        except KeyError:
+            raise MissingDataError('No {} data for isbn {}'.format(error_msg_type, isbn))
+
+        return selected_data
+
     def _query_service(self, isbn: str, verbose: bool = False):
         """
         Queries a backend service for data about the related book
