@@ -18,6 +18,9 @@ class OpenLibraryResolver(ISBNResolver):
         book_data = next(iter(book_json.items()))[1]
         return {isbn: book_data}
 
+    def get_title(self, isbn):
+        return self._get_data_or_error(isbn, ('details', 'title'), 'title')
+
     def get_author(self, isbn) -> list:
         authors = self._get_data_or_error(isbn, ('details', 'authors'), 'author')
 

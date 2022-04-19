@@ -1,3 +1,4 @@
+import copy
 import json
 import requests
 from sys import stderr
@@ -33,7 +34,7 @@ class ISBNResolver:
         except FileNotFoundError:
             self.data_file.touch()
 
-    def get_book_data(self, isbn: str, verbose: bool = False):
+    def get_book_data(self, isbn: str, verbose: bool = False) -> Union[dict, None]:
         """
         Return raw information about the related book, either from locally saved information
         (if available), or otherwise queries the backend service.
@@ -49,19 +50,28 @@ class ISBNResolver:
         # Otherwise, query for it
         book_data = self._query_service(isbn, verbose)
         with open(self.data_file, 'a') as output_file:  # Save it to the disk for later
-            json.dump(book_data, output_file)
+            if book_data:
+                json.dump(book_data, output_file)
+            else:
+                json.dump({isbn: None}, output_file)
             output_file.write('\n')
         self.data[isbn] = book_data
 
-        # May or may not have an answer, that may or may not be None
-        if isbn in self.data:
-            return self.data[isbn]
-        else:
-            return None
+        # This may be None
+        return book_data
 
     def get_author(self, isbn) -> list:
         """
         Return a list of authors of a book
+
+        :param isbn: A 10-digit or 13-digit ISBN
+        :return: A list of authors, potentially empty
+        """
+        pass
+
+    def get_title(self, isbn) -> list:
+        """
+        Return the title of a book
 
         :param isbn: A 10-digit or 13-digit ISBN
         :return: A list of authors, potentially empty
@@ -136,10 +146,10 @@ class ISBNResolver:
             raise NoBookDataError
 
         # Keep trying to go down one level at a time
-        selected_data = book_data
+        selected_data = copy.deepcopy(book_data)
         try:
             for p in path:
-                selected_data = book_data[p]
+                selected_data = selected_data[p]
         except KeyError:
             raise MissingDataError('No {} data for isbn {}'.format(error_msg_type, isbn))
 

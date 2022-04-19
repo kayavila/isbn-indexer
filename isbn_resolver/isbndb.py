@@ -1,5 +1,6 @@
+import re
 import requests
-from isbn_resolver.resolver import ISBNResolver, NoBookDataError
+from isbn_resolver.resolver import ISBNResolver
 
 
 class ISBNDBResolver(ISBNResolver):
@@ -24,21 +25,25 @@ class ISBNDBResolver(ISBNResolver):
         return {isbn: book_data}
 
     def get_msrp(self, isbn) -> list:
-        pass
+        return self._get_data_or_error(isbn, ('msrp',), 'msrp')
 
     def get_author(self, isbn) -> list:
-        pass
+        return self._get_data_or_error(isbn, ('authors',), 'author')
+
+    def get_title(self, isbn):
+        return self._get_data_or_error(isbn, ('title',), 'title')
 
     def get_year(self, isbn) -> int:
-        pass
+        date = self._get_data_or_error(isbn, ('date_published',), 'publication date')
+
+        # Quick and dirty check to see if we're getting formats other than just year from OpenLibrary
+        assert re.match('[1-9]([0-9]){3}', date)
+
+        return int(date)
 
     def get_page_count(self, isbn) -> int:
-        pass
+        page_count = self._get_data_or_error(isbn, ('pages',), 'page count')
+        return int(page_count)
 
     def get_publisher(self, isbn) -> int:
-        pass
-
-    def get_location(self, isbn) -> int:
-        pass
-
-
+        return self._get_data_or_error(isbn, ('publisher',), 'publisher')
