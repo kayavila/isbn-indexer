@@ -25,7 +25,7 @@ class ISBNDBResolver(ISBNResolver):
         return book_data
 
     def get_msrp(self, isbn) -> list:
-        return self._get_data_or_error(isbn, ('msrp',), 'msrp')
+        return float(self._get_data_or_error(isbn, ('msrp',), 'msrp'))
 
     def get_author(self, isbn) -> list:
         return self._get_data_or_error(isbn, ('authors',), 'author')
