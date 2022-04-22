@@ -1,3 +1,4 @@
+import re
 import copy
 import json
 import requests
@@ -58,6 +59,15 @@ class ISBNResolver:
         self.data[isbn] = book_data
 
         return book_data
+
+    def parse_date(self, date_string: str) -> int:
+        matches = re.findall('[1-9][0-9]{3}', date_string)
+
+        # Should only match one year
+        assert len(matches) == 1
+
+        return int(matches[0])
+
 
     def get_author(self, isbn) -> list:
         """

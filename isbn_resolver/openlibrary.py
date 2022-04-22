@@ -32,11 +32,7 @@ class OpenLibraryResolver(ISBNResolver):
 
     def get_year(self, isbn) -> int:
         date = self._get_data_or_error(isbn, ('details', 'publish_date'), 'publication date')
-
-        # Quick and dirty check to see if we're getting formats other than just year from OpenLibrary
-        assert re.match('[1-9]([0-9]){3}', date)
-
-        return int(date)
+        return self.parse_date(date)
 
     def get_page_count(self, isbn) -> int:
         num_pages = self._get_data_or_error(isbn, ('details', 'number_of_ages'), 'publication date')
