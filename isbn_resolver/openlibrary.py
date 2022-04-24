@@ -35,7 +35,7 @@ class OpenLibraryResolver(ISBNResolver):
         return self.parse_date(date)
 
     def get_page_count(self, isbn) -> int:
-        num_pages = self._get_data_or_error(isbn, ('details', 'number_of_ages'), 'publication date')
+        num_pages = self._get_data_or_error(isbn, ('details', 'number_of_pages'), 'publication date')
         return int(num_pages)
 
     def get_publisher(self, isbn) -> int:
