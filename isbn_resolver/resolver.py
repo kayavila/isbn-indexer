@@ -61,7 +61,7 @@ class ISBNResolver:
         return book_data
 
     def parse_date(self, date_string: str) -> int:
-        matches = re.findall('[1-9][0-9]{3}', date_string)
+        matches = re.findall('[12][0-9]{3}', str(date_string))
 
         # Should only match one year
         assert len(matches) == 1
