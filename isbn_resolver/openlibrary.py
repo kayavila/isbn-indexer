@@ -44,3 +44,8 @@ class OpenLibraryResolver(ISBNResolver):
     def get_location(self, isbn) -> int:
         return self._get_data_or_error(isbn, ('details', 'publish_places'), 'publication location')
 
+    def get_contributors(self, isbn) -> list:
+        return self._get_data_or_error(isbn, ('details', 'contributions'), 'contribution')
+
+    def get_by_statement(self, isbn) -> str:
+        return self._get_data_or_error(isbn, ('details', 'by_statement'), 'by statement')
