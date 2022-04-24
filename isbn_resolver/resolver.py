@@ -72,7 +72,9 @@ class ISBNResolver:
     @staticmethod
     def _unlist_if_singular(some_list: list) -> Union[list, object]:
         if len(some_list) == 1:
-            return(some_list[0])
+            return some_list[0]
+        elif len(some_list) == 0:
+            return ''
         else:
             return some_list
 
