@@ -1,5 +1,5 @@
-import re
 import requests
+from typing import Union
 from isbn_resolver.resolver import ISBNResolver
 
 
@@ -24,18 +24,19 @@ class ISBNDBResolver(ISBNResolver):
         book_data = book_json['book']
         return book_data
 
-    def get_msrp(self, isbn) -> list:
+    def get_msrp(self, isbn) -> float:
         return float(self._get_data_or_error(isbn, ('msrp',), 'msrp'))
 
-    def get_author(self, isbn) -> list:
-        return self._get_data_or_error(isbn, ('authors',), 'author')
+    def get_author(self, isbn) -> Union[str, list[str]]:
+        authors = self._get_data_or_error(isbn, ('authors',), 'author')
+        return ISBNResolver._unlist_if_singular(authors)
 
     def get_title(self, isbn):
         return self._get_data_or_error(isbn, ('title',), 'title')
 
     def get_year(self, isbn) -> int:
         date = self._get_data_or_error(isbn, ('date_published',), 'publication date')
-        return self.parse_date(date)
+        return ISBNResolver._parse_date(date)
 
     def get_page_count(self, isbn) -> int:
         page_count = self._get_data_or_error(isbn, ('pages',), 'page count')

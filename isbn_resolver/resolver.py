@@ -60,7 +60,8 @@ class ISBNResolver:
 
         return book_data
 
-    def parse_date(self, date_string: str) -> int:
+    @staticmethod
+    def _parse_date(date_string: str) -> int:
         matches = re.findall('[12][0-9]{3}', str(date_string))
 
         # Should only match one year
@@ -68,6 +69,12 @@ class ISBNResolver:
 
         return int(matches[0])
 
+    @staticmethod
+    def _unlist_if_singular(some_list: list) -> Union[list, object]:
+        if len(some_list) == 1:
+            return(some_list[0])
+        else:
+            return some_list
 
     def get_author(self, isbn) -> list:
         """
@@ -109,14 +116,6 @@ class ISBNResolver:
 
         :param isbn: A 10-digit or 13-digit ISBN
         :return: A list of publishers, potentially empty
-        """
-
-    def get_location(self, isbn) -> int:
-        """
-        Return the number of pages for a book
-
-        :param isbn: A 10-digit or 13-digit ISBN
-        :return: A list of locations published, potentially empty
         """
 
     def _get_query_request(self, isbn) -> requests.Request:

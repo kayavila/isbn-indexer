@@ -1,5 +1,5 @@
-import re
 import requests
+from typing import Union
 from isbn_resolver.resolver import ISBNResolver, NoBookDataError, MissingDataError
 
 
@@ -21,31 +21,34 @@ class OpenLibraryResolver(ISBNResolver):
     def get_title(self, isbn):
         return self._get_data_or_error(isbn, ('details', 'title'), 'title')
 
-    def get_author(self, isbn) -> list:
+    def get_author(self, isbn) -> Union[str, list[str]]:
         authors = self._get_data_or_error(isbn, ('details', 'authors'), 'author')
 
         results = []
         for a in authors:
             results.append(a['name'])
 
-        return results
+        return ISBNResolver._unlist_if_singular(results)
 
     def get_year(self, isbn) -> int:
         date = self._get_data_or_error(isbn, ('details', 'publish_date'), 'publication date')
-        return self.parse_date(date)
+        return ISBNResolver._parse_date(date)
 
     def get_page_count(self, isbn) -> int:
         num_pages = self._get_data_or_error(isbn, ('details', 'number_of_pages'), 'publication date')
         return int(num_pages)
 
-    def get_publisher(self, isbn) -> int:
-        return self._get_data_or_error(isbn, ('details', 'publishers'), 'publisher')
+    def get_publisher(self, isbn) -> Union[str, list[str]]:
+        publishers = self._get_data_or_error(isbn, ('details', 'publishers'), 'publisher')
+        return ISBNResolver._unlist_if_singular(publishers)
 
-    def get_location(self, isbn) -> int:
-        return self._get_data_or_error(isbn, ('details', 'publish_places'), 'publication location')
+    def get_location(self, isbn) -> Union[str, list[str]]:
+        locations = self._get_data_or_error(isbn, ('details', 'publish_places'), 'publication location')
+        return ISBNResolver._unlist_if_singular(locations)
 
-    def get_contributors(self, isbn) -> list:
-        return self._get_data_or_error(isbn, ('details', 'contributions'), 'contribution')
+    def get_contributors(self, isbn) -> Union[str, list[str]]:
+        contributors = self._get_data_or_error(isbn, ('details', 'contributions'), 'contribution')
+        return ISBNResolver._unlist_if_singular(contributors)
 
     def get_by_statement(self, isbn) -> str:
         return self._get_data_or_error(isbn, ('details', 'by_statement'), 'by statement')
